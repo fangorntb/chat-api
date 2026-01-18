@@ -41,13 +41,17 @@ class ChatsRoutable(Routable):
         Метод отправки сообщения в чат.
         """
         chat = await ChatRepository(session).get_by_id(id)
-        if not chat:
-            raise HTTPException(status_code=404, detail="Chat not found")
+        self.handle_chat_not_found(chat)
 
         return await MessageRepository(session).create(
             chat_id=id,
             text=payload.text,
         )
+
+    @classmethod
+    def handle_chat_not_found(cls, chat):
+        if not chat:
+            raise HTTPException(status_code=404, detail="Chat not found")
 
     @get("/chats/{id}", response_model=ChatWithMessagesResponse, )
     async def get_chat(
@@ -60,18 +64,17 @@ class ChatsRoutable(Routable):
         Метод получения чата.
         """
         chat = await ChatRepository(session).get_by_id(id)
-        if not chat:
-            raise HTTPException(status_code=404, detail="Chat not found")
+        self.handle_chat_not_found(chat)
 
         messages = await MessageRepository(session).get_last_by_chat(
             chat_id=id,
             limit=limit,
         )
 
-        return {
-            "chat": ChatResponse.model_validate(chat),
-            "messages": [MessageResponse.model_validate(m) for m in messages],
-        }
+        return ChatWithMessagesResponse(
+            chat=chat,
+            messages=messages
+        )
 
     @delete(
         "/chats/{id}",
@@ -87,6 +90,5 @@ class ChatsRoutable(Routable):
         Метод удаления чата.
         """
         deleted = await ChatRepository(session).delete_by_id(id)
-        if not deleted:
-            raise HTTPException(status_code=404, detail="Chat not found")
+        self.handle_chat_not_found(deleted)
         return None

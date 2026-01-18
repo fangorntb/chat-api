@@ -14,6 +14,7 @@ from src.app import APP
 from src.db.models import Base
 from src.db.session_maker import get_session
 
+
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(
@@ -45,6 +46,7 @@ def prepare_database():
     asyncio.run(engine.dispose())
 
 
+
 @pytest_asyncio.fixture()
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
@@ -52,7 +54,6 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
             yield session
         finally:
             await session.rollback()
-
 
 @pytest_asyncio.fixture()
 async def client(db_session: AsyncSession):
@@ -64,8 +65,8 @@ async def client(db_session: AsyncSession):
     transport = ASGITransport(app=APP)
 
     async with AsyncClient(
-            transport=transport,
-            base_url="http://test",
+        transport=transport,
+        base_url="http://test",
     ) as ac:
         yield ac
 
