@@ -1,6 +1,6 @@
 from sqlalchemy import select, desc
 
-from src.db.models import Message
+from src.infrastructure.db.models import Message
 from ._base import AbstractRepository
 
 

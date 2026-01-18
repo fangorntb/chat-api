@@ -1,94 +1,74 @@
-from fastapi import Depends, HTTPException, Query, status
+from fastapi import Depends, Query, status
 from classy_fastapi import Routable, get, post, delete
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.session_maker import get_session
-from src.db.repositories import ChatRepository, MessageRepository
 from src.api.schemas import (
     ChatCreateRequest,
-    ChatResponse, ChatWithMessagesResponse,
+    ChatResponse,
+    ChatWithMessagesResponse,
     MessageCreateRequest,
     MessageResponse,
 )
+from src.core.services.chat import ChatService
+from src.api.dependencies import get_chat_service
 
 
 class ChatsRoutable(Routable):
 
-    @post("/chats", response_model=ChatResponse, status_code=status.HTTP_201_CREATED)
+    @post(
+        "/chats/",
+        response_model=ChatResponse,
+        status_code=status.HTTP_201_CREATED,
+    )
     async def create_chat(
-            self,
-            payload: ChatCreateRequest,
-            session: AsyncSession = Depends(get_session),
+        self,
+        payload: ChatCreateRequest,
+        service: ChatService = Depends(get_chat_service),
     ):
-        """
-        Метод создания чата.
-        """
-        return await ChatRepository(session).create(title=payload.title)
+        return await service.create_chat(payload.title)
 
     @post(
         "/chats/{id}/messages/",
         response_model=MessageResponse,
         status_code=status.HTTP_201_CREATED,
-        responses={404: {'detail': 'Chat not found'}}
+        responses={
+            404: {"description": "Chat not found"},
+        },
     )
     async def send_message(
-            self,
-            id: int,
-            payload: MessageCreateRequest,
-            session: AsyncSession = Depends(get_session),
+        self,
+        id: int,
+        payload: MessageCreateRequest,
+        service: ChatService = Depends(get_chat_service),
     ):
-        """
-        Метод отправки сообщения в чат.
-        """
-        chat = await ChatRepository(session).get_by_id(id)
-        self.handle_chat_not_found(chat)
+        return await service.send_message(id, payload.text)
 
-        return await MessageRepository(session).create(
-            chat_id=id,
-            text=payload.text,
-        )
-
-    @classmethod
-    def handle_chat_not_found(cls, chat):
-        if not chat:
-            raise HTTPException(status_code=404, detail="Chat not found")
-
-    @get("/chats/{id}", response_model=ChatWithMessagesResponse, )
+    @get(
+        "/chats/{id}/",
+        response_model=ChatWithMessagesResponse,
+        responses={
+            404: {"description": "Chat not found"},
+        },
+    )
     async def get_chat(
-            self,
-            id: int,
-            limit: int = Query(default=20, ge=1, le=100),
-            session: AsyncSession = Depends(get_session),
+        self,
+        id: int,
+        limit: int = Query(default=20, ge=1, le=100),
+        service: ChatService = Depends(get_chat_service),
     ):
-        """
-        Метод получения чата.
-        """
-        chat = await ChatRepository(session).get_by_id(id)
-        self.handle_chat_not_found(chat)
-
-        messages = await MessageRepository(session).get_last_by_chat(
-            chat_id=id,
-            limit=limit,
-        )
-
-        return ChatWithMessagesResponse(
-            chat=chat,
-            messages=messages
-        )
+        chat, messages = await service.get_chat_with_messages(id, limit)
+        return ChatWithMessagesResponse(chat=chat, messages=messages)
 
     @delete(
         "/chats/{id}",
         status_code=status.HTTP_204_NO_CONTENT,
-        responses={404: {'detail': 'Chat not found'}},
+        responses={
+            404: {"description": "Chat not found"},
+        },
     )
     async def delete_chat(
-            self,
-            id: int,
-            session: AsyncSession = Depends(get_session),
+        self,
+        id: int,
+        service: ChatService = Depends(get_chat_service),
     ):
-        """
-        Метод удаления чата.
-        """
-        deleted = await ChatRepository(session).delete_by_id(id)
-        self.handle_chat_not_found(deleted)
+        await service.delete_chat(id)
         return None

@@ -1,6 +1,6 @@
 from sqlalchemy import select, delete
 
-from src.db.models import Chat
+from src.infrastructure.db.models import Chat
 from ._base import AbstractRepository
 
 

@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.app import APP
-from src.db.models import Base
-from src.db.session_maker import get_session
+from src.infrastructure.db.models import Base
+from src.infrastructure.db.session_maker import get_session
 
 
 DATABASE_URL = "sqlite+aiosqlite:///:memory:"
