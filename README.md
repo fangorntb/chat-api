@@ -16,6 +16,21 @@
 
 ## Запуск
 
+Создать dotenv-файл в корни проекта со следующим содержимым ```.env```:
+
+```text
+
+LOG_LEVEL=INFO
+
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+POSTGRES_DB=chat_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/chat_db
+```
+
 ```bash
 docker-compose -f pg.docker-compose.yml up --build
 ```
