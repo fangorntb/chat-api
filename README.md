@@ -33,9 +33,9 @@ DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/chat_db
 Далее выполнить команды:
 
 ```bash
-docker-compose -f pg.docker-compose.yml up --build
+docker-compose -f pg.docker-compose.yml up -d
 ```
 
 ```bash
-docker-compose -f app.docker-compose.yml up --build
+docker-compose -f app.docker-compose.yml up -d
 ```
