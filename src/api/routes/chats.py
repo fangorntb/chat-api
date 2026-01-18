@@ -43,7 +43,7 @@ class ChatsRoutable(Routable):
         return await service.send_message(id, payload.text)
 
     @get(
-        "/chats/{id}/",
+        "/chats/{id}",
         response_model=ChatWithMessagesResponse,
         responses={
             404: {"description": "Chat not found"},
