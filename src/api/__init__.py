@@ -1,0 +1,1 @@
+from .routes.chats import ChatsRoutable

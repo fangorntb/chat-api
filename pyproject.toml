@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "chats-api"
+version = "0.1.0"
+description = "Апи для создания чатов"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "classy-fastapi>=0.5",
+    "sqlalchemy>=2.0",
+    "asyncpg>=0.29",
+    "alembic>=1.13",
+    "psycopg2",
+    "pydantic>=2.6",
+    "python-dotenv>=1.0",
+]

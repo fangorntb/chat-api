@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: chat-api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - chat-network
+
+    volumes:
+      - ./migrations:/app/migrations
+
+    command: >
+      bash -c "
+      echo 'Waiting for postgres...' &&
+      until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER}; do
+        sleep 1;
+      done &&
+
+      echo 'Postgres is ready' &&
+
+      echo 'Applying existing migrations...' &&
+      alembic upgrade head &&
+
+      echo 'Checking for schema changes...' &&
+      if alembic check; then
+        echo 'No schema changes detected, skipping migration generation';
+      else
+        echo 'Schema changes detected, generating migration...' &&
+        alembic revision --autogenerate -m 'auto migration';
+      fi &&
+
+      echo 'Starting API...' &&
+      uvicorn src.app:APP --host 0.0.0.0 --port 8000
+      "
+    restart: unless-stopped
+
+networks:
+  chat-network:
+    external: true
