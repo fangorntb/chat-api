@@ -39,3 +39,13 @@ docker-compose -f pg.docker-compose.yml up -d
 ```bash
 docker-compose -f app.docker-compose.yml up -d
 ```
+
+## Тесты
+
+```bash
+pip install pytest pytest-asyncio
+```
+
+```bash
+pytest
+```
