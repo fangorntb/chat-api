@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_create_chat(client):
     response = await client.post(
-        "/chats",
+        "/chats/",
         json={"title": "Test chat"},
     )
 
@@ -17,7 +17,7 @@ async def test_create_chat(client):
 
 @pytest.mark.asyncio
 async def test_send_message(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     response = await client.post(
@@ -45,7 +45,7 @@ async def test_send_message_chat_not_found(client):
 
 @pytest.mark.asyncio
 async def test_get_chat_with_messages(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     for i in range(5):
@@ -65,7 +65,7 @@ async def test_get_chat_with_messages(client):
 
 @pytest.mark.asyncio
 async def test_get_chat_limit_max(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     for i in range(150):
@@ -81,7 +81,7 @@ async def test_get_chat_limit_max(client):
 
 @pytest.mark.asyncio
 async def test_delete_chat_cascade(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     await client.post(
@@ -105,7 +105,7 @@ async def test_delete_chat_not_found(client):
 @pytest.mark.asyncio
 async def test_create_chat_empty_title(client):
     response = await client.post(
-        "/chats",
+        "/chats/",
         json={"title": ""},
     )
 
@@ -115,7 +115,7 @@ async def test_create_chat_empty_title(client):
 @pytest.mark.asyncio
 async def test_create_chat_title_only_spaces(client):
     response = await client.post(
-        "/chats",
+        "/chats/",
         json={"title": "   "},
     )
 
@@ -125,7 +125,7 @@ async def test_create_chat_title_only_spaces(client):
 @pytest.mark.asyncio
 async def test_create_chat_title_too_long(client):
     response = await client.post(
-        "/chats",
+        "/chats/",
         json={"title": "a" * 201},
     )
 
@@ -135,7 +135,7 @@ async def test_create_chat_title_too_long(client):
 @pytest.mark.asyncio
 async def test_create_chat_title_trimmed(client):
     response = await client.post(
-        "/chats",
+        "/chats/",
         json={"title": "   Мой чат   "},
     )
 
@@ -145,7 +145,7 @@ async def test_create_chat_title_trimmed(client):
 
 @pytest.mark.asyncio
 async def test_send_message_empty_text(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     response = await client.post(
@@ -158,7 +158,7 @@ async def test_send_message_empty_text(client):
 
 @pytest.mark.asyncio
 async def test_send_message_text_only_spaces(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     response = await client.post(
@@ -171,7 +171,7 @@ async def test_send_message_text_only_spaces(client):
 
 @pytest.mark.asyncio
 async def test_send_message_text_too_long(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     response = await client.post(
@@ -184,7 +184,7 @@ async def test_send_message_text_too_long(client):
 
 @pytest.mark.asyncio
 async def test_send_message_text_trimmed(client):
-    chat = await client.post("/chats", json={"title": "Chat"})
+    chat = await client.post("/chats/", json={"title": "Chat"})
     chat_id = chat.json()["id"]
 
     response = await client.post(
@@ -193,4 +193,5 @@ async def test_send_message_text_trimmed(client):
     )
 
     assert response.status_code == 201
+
     assert response.json()["text"] == "Hello world"
